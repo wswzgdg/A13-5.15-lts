@@ -799,6 +799,5 @@
   is_ashmem_file
   zero_pfn
   is_transparent_hugepage
-  isolate_page
-  reclaim_pages
+
   schedtune_task_boost
