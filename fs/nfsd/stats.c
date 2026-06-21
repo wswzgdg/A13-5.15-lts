@@ -127,6 +127,7 @@ static void nfsd_stat_counters_destroy(void)
 }
 
 int nfsd_stat_init(void)
+struct proc_dir_entry *nfsd_proc_stat_init(struct net *net)
 {
 	int err;
 
