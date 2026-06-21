@@ -1,0 +1,40 @@
+name: Sync AOSP upstream
+
+on:
+  schedule:
+    - cron: "0 18 * * *"
+  workflow_dispatch:
+
+concurrency:
+  group: sync-upstream
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - name: Checkout main (workflow only)
+        uses: actions/checkout@v4
+        with:
+          ref: main
+          fetch-depth: 1
+
+      - name: Fetch upstream and push to android13-5.15-lts branch
+        run: |
+          git remote add aosp https://android.googlesource.com/kernel/common
+          git fetch aosp android13-5.15-lts --depth=50
+
+          upstream_head=$(git rev-parse aosp/android13-5.15-lts)
+
+          # Check if our branch exists and is already up to date
+          local_head=$(git ls-remote origin refs/heads/android13-5.15-lts | awk '{print $1}')
+          if [ "$upstream_head" = "$local_head" ]; then
+            echo "already up to date"
+            exit 0
+          fi
+
+          git push origin aosp/android13-5.15-lts:refs/heads/android13-5.15-lts --force
