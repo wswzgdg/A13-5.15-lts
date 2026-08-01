@@ -2324,6 +2324,8 @@ static int f2fs_file_mmap(struct file *file, struct vm_area_struct *vma)
 	return 0;
 }
 
+static int f2fs_release_file(struct inode *inode, struct file *filp);
+
 static int finish_preallocate_blocks(struct inode *inode)
 {
 	int ret;
