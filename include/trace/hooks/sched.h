@@ -448,6 +448,15 @@ DECLARE_HOOK(android_vh_mmput,
 	TP_PROTO(struct mm_struct *mm),
 	TP_ARGS(mm));
 
+DECLARE_RESTRICTED_HOOK(android_rvh_before_pick_task_fair,
+	TP_PROTO(struct rq *rq, struct task_struct **p,
+		 struct task_struct *prev, struct rq_flags *rf),
+	TP_ARGS(rq, p, prev, rf), 1);
+
+DECLARE_RESTRICTED_HOOK(android_rvh_balance_fair,
+	TP_PROTO(struct rq *rq, struct task_struct *prev, struct rq_flags *rf),
+	TP_ARGS(rq, prev, rf), 1);
+
 struct cgroup_subsys_state;
 DECLARE_HOOK(android_vh_cpu_cgroup_css_alloc,
 	TP_PROTO(struct task_group *tg, struct cgroup_subsys_state *parent_css),

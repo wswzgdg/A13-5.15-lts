@@ -530,7 +530,7 @@ TRACE_EVENT(sched_blocked_reason,
 
 	TP_fast_assign(
 		__entry->pid	= tsk->pid;
-		__entry->caller = (void *)get_wchan(tsk);
+		__entry->caller = (void *)__get_wchan(tsk);
 		__entry->io_wait = tsk->in_iowait;
 		__entry->layer1 = (void *)get_backtrace(tsk, 0);
 		__entry->layer2 = (void *)get_backtrace(tsk, 1);
