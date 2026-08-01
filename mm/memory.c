@@ -5091,7 +5091,6 @@ alloc_page_done:
 #endif
 		locked = lock_page_or_retry(page, vma->vm_mm, vmf->flags);
 	trace_android_vh_do_swap_page_lock_check(page, vmf);
-	locked = lock_page_or_retry(page, vma->vm_mm, vmf->flags);
 
 	delayacct_clear_flag(current, DELAYACCT_PF_SWAPIN);
 	if (!locked) {
