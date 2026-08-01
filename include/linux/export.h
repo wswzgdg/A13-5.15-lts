@@ -24,7 +24,21 @@ extern struct module __this_module;
 #ifdef CONFIG_MODVERSIONS
 /* Mark the CRC weak since genksyms apparently decides not to
  * generate a checksums for some symbols */
-#if defined(CONFIG_MODULE_REL_CRCS)
+#if defined(CONFIG_LTO_CLANG)
+/*
+ * With LTO, the CRC cannot be emitted via inline asm because the linker
+ * cannot handle the resulting relocations (R_AARCH64_ABS32/PREL32 against
+ * __crc_* symbols). Instead, define the CRC reference as a C variable in
+ * a special section that the linker can resolve as a simple absolute
+ * symbol assignment.
+ */
+#define __CRC_SYMBOL(sym, sec)						\
+	extern __visible void *__crc_##sym __attribute__((weak));	\
+	static const unsigned long __kcrctab_##sym			\
+	__used __attribute__((section("___kcrctab" sec "+" #sym),	\
+			      used, aligned(sizeof(void *))))		\
+	= (unsigned long)&__crc_##sym;
+#elif defined(CONFIG_MODULE_REL_CRCS)
 #define __CRC_SYMBOL(sym, sec)						\
 	asm("	.section \"___kcrctab" sec "+" #sym "\", \"a\"	\n"	\
 	    "	.weak	__crc_" #sym "				\n"	\
