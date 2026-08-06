@@ -15,18 +15,18 @@ permissions:
 jobs:
   sync:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 60
     steps:
       - name: Checkout main (workflow only)
         uses: actions/checkout@v4
         with:
           ref: main
-          fetch-depth: 1
+          fetch-depth: 0
 
       - name: Fetch upstream and push to android13-5.15-lts branch
         run: |
           git remote add aosp https://android.googlesource.com/kernel/common
-          git fetch aosp android13-5.15-lts --depth=50
+          git fetch aosp android13-5.15-lts --no-tags
 
           upstream_head=$(git rev-parse aosp/android13-5.15-lts)
 
