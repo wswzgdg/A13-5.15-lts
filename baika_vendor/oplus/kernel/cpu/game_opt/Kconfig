@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+config OPLUS_FEATURE_GAME_OPT
+	tristate "Oplus game optimization"
+	depends on ARM64 && CPU_FREQ && ENERGY_MODEL && ANDROID_VENDOR_HOOKS
+	default m
+	help
+	  Enable Oplus game scheduling and frame optimization.

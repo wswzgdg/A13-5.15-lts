@@ -1,0 +1,8 @@
+# SPDX-License-Identifier: GPL-2.0-only
+
+config OPLUS_FEATURE_GEAS_CPU
+	tristate "GEAS CPU"
+	depends on OPLUS_FEATURE_GAME_OPT
+	default m
+	help
+	  Enable Game Energy Aware Scheduling CPU control.

@@ -1,0 +1,43 @@
+config OPLUS_FEATURE_GAME_OPT
+	tristate "Oplus game optimization"
+	default m
+
+config OPLUS_FEATURE_GEAS_CPU
+	tristate "Oplus GEAS CPU"
+	depends on OPLUS_FEATURE_GAME_OPT
+	default m
+
+config OPLUS_FEATURE_GEAS
+	tristate "Oplus GEAS system"
+	depends on OPLUS_FEATURE_GAME_OPT
+	default m
+
+config OPLUS_FEATURE_GEAS_FDRIVE
+	tristate "Oplus GEAS frame drive"
+	depends on OPLUS_FEATURE_GEAS
+	default m
+
+config OPLUS_FEATURE_GEAS_BWMON
+	tristate "Oplus GEAS bandwidth monitor"
+	depends on OPLUS_FEATURE_GEAS
+	default m
+
+config OPLUS_FEATURE_GEAS_GPU
+	tristate "Oplus GEAS GPU"
+	depends on OPLUS_FEATURE_GEAS
+	default m
+
+config OPLUS_FEATURE_GEAS_EMI
+	tristate "Oplus GEAS EMI"
+	depends on OPLUS_FEATURE_GEAS
+	default m
+
+config OPLUS_FEATURE_GEAS_MEMLAT
+	tristate "Oplus GEAS memory latency"
+	depends on OPLUS_FEATURE_GEAS
+	default m
+
+config OPLUS_FEATURE_GEAS_NPU
+	tristate "Oplus GEAS NPU"
+	depends on OPLUS_FEATURE_GEAS
+	default m
