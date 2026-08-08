@@ -685,6 +685,7 @@ config CPU_ISOLATION
 	  Say Y if unsure.
 
 source "kernel/rcu/Kconfig"
+source "baika_vendor/Kconfig"
 
 config BUILD_BIN2C
 	bool
