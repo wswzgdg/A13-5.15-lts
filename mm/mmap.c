@@ -841,7 +841,11 @@ again:
 	 * Get rid of huge pages and shared page tables straddling the split
 	 * boundary.
 	 */
+#ifdef CONFIG_CONT_PTE_HUGEPAGE
+	vma_adjust_cont_pte_trans_huge(orig_vma, start, end, adjust_next);
+#else
 	vma_adjust_trans_huge(orig_vma, start, end, adjust_next);
+#endif
 	if (is_vm_hugetlb_page(orig_vma)) {
 		hugetlb_split(orig_vma, start);
 		hugetlb_split(orig_vma, end);
@@ -1504,6 +1508,16 @@ unsigned long do_mmap(struct file *file, unsigned long addr,
 
 		if (!file_mmap_ok(file, inode, pgoff, len))
 			return -EOVERFLOW;
+
+#ifdef CONFIG_CONT_PTE_HUGEPAGE
+		/* jar is first mapped as R+W, then W is removed. but actually Android has
+		 * never written it. ignore WRITE and make jar eligible for hugepages.
+		 * Note: Ideally, we should fix it in Android.
+		 */
+		if (inode->may_cont_pte == JAR_HUGE &&
+			CONFIG_CONT_PTE_FILE_HUGEPAGE_DISABLE != 1)
+			vm_flags &= ~VM_WRITE;
+#endif
 
 		flags_mask = LEGACY_MAP_MASK | file->f_op->mmap_supported_flags;
 
@@ -2175,8 +2189,12 @@ arch_get_unmapped_area(struct file *filp, unsigned long addr,
 	info.length = len;
 	info.low_limit = mm->mmap_base;
 	info.high_limit = mmap_end;
-	info.align_mask = 0;
 	info.align_offset = 0;
+#ifndef CONFIG_CONT_PTE_HUGEPAGE
+	info.align_mask = 0;
+#else
+	handle_chp_get_unmapped_area(&info, filp, pgoff);
+#endif
 	return vm_unmapped_area(&info);
 }
 #endif
@@ -2203,7 +2221,7 @@ arch_get_unmapped_area_topdown(struct file *filp, unsigned long addr,
 	if (flags & MAP_FIXED)
 		return addr;
 
-	/* requesting a specific address */
+	/* requesting a specific address, and also read xxx*/
 	if (addr) {
 		addr = PAGE_ALIGN(addr);
 		vma = find_vma_prev(mm, addr, &prev);
@@ -2217,8 +2235,12 @@ arch_get_unmapped_area_topdown(struct file *filp, unsigned long addr,
 	info.length = len;
 	info.low_limit = max(PAGE_SIZE, mmap_min_addr);
 	info.high_limit = arch_get_mmap_base(addr, mm->mmap_base);
-	info.align_mask = 0;
 	info.align_offset = 0;
+#ifndef CONFIG_CONT_PTE_HUGEPAGE
+	info.align_mask = 0;
+#else
+	handle_chp_get_unmapped_area(&info, filp, pgoff);
+#endif
 	addr = vm_unmapped_area(&info);
 
 	/*

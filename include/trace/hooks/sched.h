@@ -262,6 +262,14 @@ DECLARE_HOOK(android_vh_map_util_freq_new,
 		bool *need_freq_update),
 	TP_ARGS(util, freq, cap, next_freq, policy, need_freq_update));
 
+DECLARE_HOOK(android_vh_sched_move_task,
+	TP_PROTO(struct task_struct *tsk),
+	TP_ARGS(tsk));
+
+DECLARE_HOOK(android_vh_reweight_entity,
+	TP_PROTO(struct sched_entity *se),
+	TP_ARGS(se));
+
 DECLARE_HOOK(android_vh_em_cpu_energy,
 	TP_PROTO(struct em_perf_domain *pd,
 		unsigned long max_util, unsigned long sum_util,
@@ -440,10 +448,6 @@ DECLARE_HOOK(android_vh_mmput,
 	TP_PROTO(struct mm_struct *mm),
 	TP_ARGS(mm));
 
-DECLARE_HOOK(android_vh_reweight_entity,
-	TP_PROTO(struct sched_entity *se),
-	TP_ARGS(se));
-
 DECLARE_RESTRICTED_HOOK(android_rvh_before_pick_task_fair,
 	TP_PROTO(struct rq *rq, struct task_struct **p,
 		 struct task_struct *prev, struct rq_flags *rf),
@@ -454,9 +458,6 @@ DECLARE_RESTRICTED_HOOK(android_rvh_balance_fair,
 	TP_ARGS(rq, prev, rf), 1);
 
 struct cgroup_subsys_state;
-DECLARE_HOOK(android_vh_sched_move_task,
-	TP_PROTO(struct task_struct *tsk),
-	TP_ARGS(tsk));
 DECLARE_HOOK(android_vh_cpu_cgroup_css_alloc,
 	TP_PROTO(struct task_group *tg, struct cgroup_subsys_state *parent_css),
 	TP_ARGS(tg, parent_css));
