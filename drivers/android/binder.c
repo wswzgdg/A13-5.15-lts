@@ -1283,13 +1283,13 @@ static struct binder_ref *binder_get_ref_for_node_olocked(
 					struct binder_node *node,
 					struct binder_ref *new_ref)
 {
+	struct binder_context *context = proc->context;
 	struct binder_ref *ref;
 	struct rb_node *parent;
 	struct rb_node **p;
 	struct rb_node *n;
 	bool create_desc = true;
 
-retry:
 	p = &proc->refs_by_node.rb_node;
 	parent = NULL;
 	while (*p) {
@@ -1305,10 +1305,6 @@ retry:
 	}
 	if (!new_ref)
 		return NULL;
-
-	/* might release the proc->outer_lock */
-	if (get_ref_desc_olocked(proc, node, &desc) == -EAGAIN)
-		goto retry;
 
 	binder_stats_created(BINDER_STAT_REF);
 	new_ref->data.debug_id = atomic_inc_return(&binder_last_id);
