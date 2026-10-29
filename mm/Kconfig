@@ -942,6 +942,17 @@ config LRU_GEN_STATS
 	  This option has a per-memcg and per-node memory overhead.
 # }
 
+config MEMFD_ASHMEM_SHIM
+	bool "Memfd ashmem ioctl compatibility support"
+	depends on MEMFD_CREATE
+	help
+	  This provides compatibility support for ashmem ioctl commands against
+	  memfd file descriptors. This is useful for compatibility on Android
+	  for older applications that may use ashmem's ioctl commands on the
+	  now memfds passed to them.
+
+	  Unless you are running Android, say N.
+
 source "mm/damon/Kconfig"
 
 config ARCH_SUPPORTS_SPECULATIVE_PAGE_FAULT
@@ -965,5 +976,34 @@ config SPECULATIVE_PAGE_FAULT
 	  If the check fails due to a concurrent writer, or due to hitting
 	  an unsupported case, the fault handler falls back to classical
 	  processing using the mmap read lock.
+
+config CONT_PTE_HUGEPAGE
+	bool "Cont Pte Hugepage support"
+	default y
+	depends on ARM64 && TRANSPARENT_HUGEPAGE
+	help
+	  Try to THP-like Hugepages based on ARM64 cont-pte.
+
+config CONT_PTE_HUGEPAGE_ON_EXT4
+	bool "Cont Pte Hugepage support on EXT4"
+	default n
+	depends on CONT_PTE_HUGEPAGE
+	help
+	  Try to THP-like Hugepages based on ARM64 cont-pte on ext4
+
+config CONT_PTE_HUGEPAGE_ON_QEMU
+	bool "Cont Pte Hugepage support on QEMU"
+	default n
+	depends on CONT_PTE_HUGEPAGE
+	help
+	  QEMU debugging of ContPte hugepage
+
+config CONT_PTE_HUGEPAGE_64K_ZRAM
+	bool "Cont Pte Hugepage support 64K ZRAM"
+	default y
+	depends on CONT_PTE_HUGEPAGE
+
+	help
+	  Cont Pte Hugepage support 64K ZRAM
 
 endmenu
