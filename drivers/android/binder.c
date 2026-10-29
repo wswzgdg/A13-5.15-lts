@@ -1287,6 +1287,7 @@ static struct binder_ref *binder_get_ref_for_node_olocked(
 	struct rb_node *parent;
 	struct rb_node **p;
 	u32 desc;
+	bool create_desc = true;
 
 retry:
 	p = &proc->refs_by_node.rb_node;
@@ -1317,6 +1318,12 @@ retry:
 	rb_insert_color(&new_ref->rb_node_node, &proc->refs_by_node);
 
 	new_ref->data.desc = desc;
+
+	trace_android_vh_binder_find_desc(proc, &new_ref->data.desc,
+		&new_ref->rb_node_desc, &create_desc);
+
+	if (!create_desc)
+		goto skip_create_desc;
 	p = &proc->refs_by_desc.rb_node;
 	while (*p) {
 		parent = *p;
@@ -1332,6 +1339,7 @@ retry:
 	rb_link_node(&new_ref->rb_node_desc, parent, p);
 	rb_insert_color(&new_ref->rb_node_desc, &proc->refs_by_desc);
 
+skip_create_desc:
 	binder_node_lock(node);
 	hlist_add_head(&new_ref->node_entry, &node->refs);
 
@@ -1358,6 +1366,7 @@ static void binder_cleanup_ref_olocked(struct binder_ref *ref)
 		dbitmap_clear_bit(dmap, ref->data.desc);
 	rb_erase(&ref->rb_node_desc, &ref->proc->refs_by_desc);
 	rb_erase(&ref->rb_node_node, &ref->proc->refs_by_node);
+	trace_android_vh_binder_set_desc_bit(ref->proc, ref->data.desc);
 
 	binder_node_inner_lock(ref->node);
 	if (ref->data.strong)
@@ -3313,6 +3322,7 @@ static void binder_transaction(struct binder_proc *proc,
 			goto err_dead_binder;
 		}
 		e->to_node = target_node->debug_id;
+		trace_android_vh_binder_trans(target_proc, proc, thread, tr);
 		if (WARN_ON(proc == target_proc)) {
 			return_error = BR_FAILED_REPLY;
 			return_error_param = -EINVAL;
@@ -6213,6 +6223,7 @@ static int binder_open(struct inode *nodp, struct file *filp)
 	INIT_LIST_HEAD(&proc_wrapper(proc)->delivered_freeze);
 	INIT_LIST_HEAD(&proc->waiting_threads);
 	filp->private_data = proc;
+	trace_android_vh_binder_desc_init(proc);
 
 	mutex_lock(&binder_procs_lock);
 	hlist_for_each_entry(itr, &binder_procs, proc_node) {
